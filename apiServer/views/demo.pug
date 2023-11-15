@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  form(action="/demo" method="post" enctype="multipart/form-data")
+    ul 
+        li 
+            input(type="file" name="photos" multiple)
+        li 
+            button(type="submit") submit
