@@ -4,18 +4,19 @@ var {
   Types: { ObjectId },
 } = require("mongoose");
 
-var md, schema;
+var schema;
 
 schema = new Schema({
   name: String,
-  price: Number,
-  stock: Number,
-  discount: Number,
-  sold: Number,
-  soldThisMonth: Number,
+  description: String,
+  price: { type: Number, min: 0 },
+  stock: { type: Number, min: 0 },
+  discount: { type: Number, min: 0, max: 100, default: 0 },
+  sold: { type: Number, min: 0, default: 0 },
+  soldThisMonth: { type: Number, min: 0 },
   category: ObjectId,
   supplier: ObjectId,
-  createdAt: Date,
+  createdAt: { type: Date, default: new Date() },
   coverPhoto: String,
   photos: { type: [String], default: [] },
 });

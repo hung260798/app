@@ -4,17 +4,17 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
-var dotenv = require("dotenv")
+var dotenv = require("dotenv");
 dotenv.config();
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var shopRouter = require("./routes/shop");
+// var indexRouter = require("./routes/index");
+// var usersRouter = require("./routes/users");
 const { default: mongoose } = require("mongoose");
 
 var app = express();
 const DB_NAME = "online_shop_test";
 const MONGO_URL = "mongodb://127.0.0.1:27017/" + DB_NAME;
+
 
 mongoose.connect(MONGO_URL, { serverSelectionTimeoutMS: 3000 }).catch((err) => {
   console.log(err);
@@ -33,8 +33,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/", shopRouter);
+// app.use("/users", usersRouter);
+
+var myRoutes = ["categories", "customers", "employees", "orders", "products"];
+for (let route of myRoutes) {
+  app.use(`/${route}`, require("./routes/" + route));
+}
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

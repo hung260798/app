@@ -4,7 +4,7 @@ var {
   Types: { ObjectId },
 } = require("mongoose");
 
-var md, schema;
+var schema;
 
 schema = new Schema(
   {

@@ -4,10 +4,11 @@ var {
   Types: { ObjectId },
 } = require("mongoose");
 
-var md, schema;
+var schema;
 
 schema = new Schema({
   name: String,
+  label: String,
   description: String,
   order: Number,
   coverPhoto: String,

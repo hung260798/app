@@ -12,20 +12,24 @@ schema = new Schema(
       id: ObjectId,
       fullname: String,
     },
-    orderedAt: Date,
-    verifiedAt: Date,
-    completedAt: Date,
-    status: String,
-    payment: String,
+    createdAt: { type: Date, default: new Date() },
+    verifiedAt: { type: Date, default: null },
+    completedAt: { type: Date, default: null },
+    status: {
+      type: String,
+      default: "VERIFYING",
+      uppercase: true,
+      enum: ["VERIFYING", "SHIPPING", "COMPLETED", "CANCELLED"],
+    },
+    payment: { type: String, default: "CASH", uppercase: true },
     shippingAddress: String,
     items: [
       {
         id: ObjectId,
         name: String,
-        stock: Number,
         price: Number,
-        quantity: Number,
-        discount: Number,
+        quantity: { type: Number, default: 1 },
+        discount: { type: Number, default: 0 },
       },
     ],
   },
@@ -34,8 +38,7 @@ schema = new Schema(
       total: {
         get() {
           let total = 0;
-          for (const { price = 0, quantity: qty = 0, discount = 0 } of this
-            .items) {
+          for (const { price = 0, quantity: qty, discount = 0 } of this.items) {
             total += price * qty * (1 - discount / 100);
           }
           return total;

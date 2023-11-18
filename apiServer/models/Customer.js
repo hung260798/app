@@ -9,7 +9,7 @@ schema = new Schema(
   {
     firstName: String,
     lastName: String,
-    displayName: String,
+    username: String,
     phone: String,
     email: String,
     avatar: String,
@@ -17,14 +17,17 @@ schema = new Schema(
     gender: String,
     accountPassword: String,
     isVerified: Boolean,
-    cart: [
-      {
-        id: ObjectId,
-        name: String,
-        quantity: Number,
-        price: Number,
-      },
-    ],
+    cart: {
+      type: [
+        {
+          id: ObjectId,
+          name: String,
+          quantity: Number,
+          price: Number,
+        },
+      ],
+      default: [],
+    },
   },
   {
     virtuals: {
