@@ -1,13 +1,19 @@
 const { Router } = require("express");
 const Employee = require("../models/Employee");
+const { adminAuth } = require("../helper/auth");
 
-module.exports = Router()
+const router = (module.exports = Router());
+router.use(adminAuth.authenticate("jwt", { session: false }));
+
+router
   .get("/", async (req, res) => {
     try {
       const employees = await Employee.find({});
       res.send(employees);
     } catch (error) {
-      res.send({ err: error.name });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .get("/detail/:id", async (req, res) => {
@@ -16,7 +22,9 @@ module.exports = Router()
       const employee = await Employee.findById(id);
       res.send(employee);
     } catch (error) {
-      res.send({ err: error.name });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .post("/", async (req, res) => {
@@ -29,7 +37,9 @@ module.exports = Router()
       await employee.save();
       res.send(employee);
     } catch (error) {
-      res.send({ err: error.name });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .patch("/", async (req, res) => {
@@ -45,7 +55,9 @@ module.exports = Router()
       await employee.save();
       res.send(employee);
     } catch (error) {
-      res.send({ err: error.name });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .delete("/", async (req, res) => {
@@ -56,6 +68,8 @@ module.exports = Router()
       const employee = await Employee.findByIdAndDelete(id);
       res.send(employee);
     } catch (error) {
-      res.send({ err: error.name });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   });

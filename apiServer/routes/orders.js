@@ -9,9 +9,9 @@ async function verifyOrder(req, res) {
     order.verifiedAt = new Date();
     order.status = "waiting";
     console.log(await order.save());
-    res.send("OK")
+    res.send("OK");
   } catch (error) {
-    res.status(500).send("Error");
+    res.send(req.app.get("env") === "development" ? error.toString() : "Error");
   }
 }
 
@@ -26,22 +26,14 @@ async function cancelOrder(req, res) {
       await product.save();
     }
     console.log(await order.save());
-    res.send("OK")
+    res.send("OK");
   } catch (error) {
-    res.status(500).send("Error");
+    res.send(req.app.get("env") === "development" ? error.toString() : "Error");
   }
 }
 
 module.exports = Router()
-  .get("/", async (req, res) => {
-    try {
-      const orders = await Order.find({});
-      res.send(orders);
-    } catch (error) {
-      res.send({ error: error.message });
-    }
-  })
-  .get("/query", async function (req, res) {
+  .get("/", async function (req, res) {
     try {
       const {
         sortBy,
@@ -62,36 +54,33 @@ module.exports = Router()
       const orders = await dbquery.exec();
       res.send(orders);
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
-  .get("/detail/:id", async (req, res) => {
+  .get("/byid/:id", async (req, res) => {
     try {
-      const {
-        params: { id },
-      } = req;
-      const order = await Order.findById(id);
+      const order = await Order.findById(req.params.id);
       res.send(order);
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
-  .get("/myOrders", async (req, res) => {
+  .get("/myorders", async (req, res) => {
     try {
-      const {
-        user: { _id: customerId },
-      } = req;
-      const orders = await Order.find({ "customer.id": customerId });
+      const orders = await Order.find({ "customer.id": req.user._id });
       res.send(orders);
     } catch (error) {
-      res.send({
-        error: error.message,
-      });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .post("/", async (req, res) => {
     try {
-      console.log(req.body);
       const order = new Order(req.body);
       for (let item of order.items) {
         const product = await Product.findById(item.id);
@@ -99,8 +88,9 @@ module.exports = Router()
       }
       res.send(await order.save());
     } catch (error) {
-      console.log(error);
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .patch("/", async (req, res) => {
@@ -115,7 +105,9 @@ module.exports = Router()
       }
       res.send(await order.save());
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .post("/verify", async (req, res) => {
@@ -132,7 +124,9 @@ module.exports = Router()
       order.status = "waiting";
       res.send(await order.save());
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .delete("/", async (req, res) => {
@@ -143,6 +137,8 @@ module.exports = Router()
       const order = await Order.findByIdAndDelete(id);
       res.send(order);
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   });

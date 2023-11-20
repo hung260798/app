@@ -23,7 +23,9 @@ module.exports = Router()
         )
       );
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .get("/logout", async (req, res) => {
@@ -33,7 +35,9 @@ module.exports = Router()
       let rs = await Token.deleteOne({ token });
       res.send({ info: rs });
     } catch (error) {
-      res.send({ err: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .post("/", async (req, res) => {
@@ -48,6 +52,8 @@ module.exports = Router()
       await admin.save();
       res.send(admin);
     } catch (error) {
-      res.send({ err: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   });

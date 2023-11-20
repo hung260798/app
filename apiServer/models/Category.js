@@ -7,11 +7,11 @@ var {
 var schema;
 
 schema = new Schema({
-  name: String,
+  name: { type: String, required: true, index: 1 },
   label: String,
   description: String,
-  order: Number,
-  coverPhoto: String,
+  order: { type: Number, default: 1 },
+  coverPhoto: { type: String, default: "" },
 });
 
 module.exports = model("Category", schema);

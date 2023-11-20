@@ -9,25 +9,31 @@ var schema;
 schema = new Schema(
   {
     customer: {
-      id: ObjectId,
-      fullname: String,
+      id: { type: ObjectId, required: true },
+      name: String,
     },
     createdAt: { type: Date, default: new Date() },
-    verifiedAt: { type: Date, default: null },
-    completedAt: { type: Date, default: null },
+    verifiedAt: { type: Date },
+    completedAt: { type: Date },
+    isVerified: { type: Boolean, default: false },
     status: {
       type: String,
-      default: "VERIFYING",
+      default: "WAITING",
       uppercase: true,
-      enum: ["VERIFYING", "SHIPPING", "COMPLETED", "CANCELLED"],
+      enum: ["WAITING", "COMPLETED", "CANCELLED"],
     },
-    payment: { type: String, default: "CASH", uppercase: true },
+    payment: {
+      type: String,
+      default: "CASH",
+      enum: ["CASH", "CREDIT"],
+      uppercase: true,
+    },
     shippingAddress: String,
     items: [
       {
-        id: ObjectId,
+        id: { type: ObjectId, required: true },
         name: String,
-        price: Number,
+        price: { type: Number },
         quantity: { type: Number, default: 1 },
         discount: { type: Number, default: 0 },
       },

@@ -7,9 +7,9 @@ var {
 var schema;
 
 schema = new Schema({
-  username: String,
-  password: String,
-  type: String,
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+  type: { type: String },
 });
 
 module.exports = model("Admin", schema);

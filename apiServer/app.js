@@ -10,11 +10,8 @@ dotenv.config();
 // var indexRouter = require("./routes/index");
 // var usersRouter = require("./routes/users");
 const { default: mongoose } = require("mongoose");
-
+const { MONGO_URL } = require("./config");
 var app = express();
-const DB_NAME = "online_shop_test";
-const MONGO_URL = "mongodb://127.0.0.1:27017/" + DB_NAME;
-
 
 mongoose.connect(MONGO_URL, { serverSelectionTimeoutMS: 3000 }).catch((err) => {
   console.log(err);

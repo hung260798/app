@@ -4,19 +4,23 @@ var {
   Types: { ObjectId },
 } = require("mongoose");
 
-var schema;
-schema = new Schema(
+const schema = new Schema(
   {
-    firstName: String,
-    lastName: String,
-    username: String,
-    phone: String,
-    email: String,
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    username: {
+      type: String,
+      default: function () {
+        return this.firstName + " " + this.lastName;
+      },
+    },
+    phone: { type: String, required: true },
+    email: { type: String },
     avatar: String,
-    birthday: Date,
-    gender: String,
-    accountPassword: String,
-    isVerified: Boolean,
+    birthday: { type: Date },
+    gender: { type: String, enum: ["MALE", "FEMALE", "OTHER"] },
+    accountPassword: { type: String, required: true },
+    isVerified: { type: Boolean, default: true },
     cart: {
       type: [
         {
@@ -24,6 +28,7 @@ schema = new Schema(
           name: String,
           quantity: Number,
           price: Number,
+          discount: Number,
         },
       ],
       default: [],

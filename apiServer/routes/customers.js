@@ -3,19 +3,26 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const process = require("node:process");
 const Customer = require("../models/Customer");
-const upload = require("../helper/fileUpload");
+const CustomerView = require("../models/views/Customer");
+const { uploadFile } = require("../helper/upload");
 const { userAuth } = require("../helper/auth");
 
-module.exports = Router()
+var router = (module.exports = Router());
+router
   .get("/", async (req, res) => {
     try {
       const { page = 1, nItems = 40 } = req.query;
-      const dbquery = Customer.find({});
-      dbquery.limit(nItems).skip((page - 1) * nItems);
+      const dbquery = CustomerView.find({});
+      dbquery
+        .limit(nItems)
+        .skip((page - 1) * nItems)
+        .select({ accountPassword: 0 });
       const users = await dbquery.exec();
       res.send(users);
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
   .get("/detail/:id", async (req, res) => {
@@ -26,21 +33,11 @@ module.exports = Router()
       const user = await Customer.findById(id);
       res.send(user);
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
-  .get(
-    "/cart",
-    userAuth.authenticate("jwt", { session: false }),
-    async (req, res) => {
-      try {
-        const customer = await Customer.findById(req.user.id);
-        res.send(customer.cart);
-      } catch (error) {
-        res.send("error");
-      }
-    }
-  )
   .post("/", async (req, res) => {
     try {
       console.log(req.body);
@@ -54,27 +51,35 @@ module.exports = Router()
       await newCustomer.save();
       res.send(newCustomer);
     } catch (error) {
-      res.send("error");
-      console.error(error);
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   })
-  .patch("/", upload.single("avatar"), async (req, res) => {
-    try {
-      const {
-        query: { id },
-        body,
-        file,
-      } = req;
-      const user = await Customer.findById(id);
-      for (let k in body) {
-        user[k] = body[k];
+  .patch(
+    "/",
+    userAuth.authenticate("jwt", { session: false }),
+    uploadFile.single("avatar"),
+    async (req, res) => {
+      try {
+        const {
+          query: { id },
+          body,
+          file,
+        } = req;
+        const user = await Customer.findById(id);
+        for (let k in body) {
+          user[k] = body[k];
+        }
+        user.avatar = file.filename;
+        res.send(await user.save());
+      } catch (error) {
+        res.send(
+          req.app.get("env") === "development" ? error.toString() : "Error"
+        );
       }
-      user.avatar = file.filename;
-      res.send(await user.save());
-    } catch (error) {
-      res.send({ error: error.message });
     }
-  })
+  )
   .post("/login", async (req, res) => {
     try {
       const { username, phone, password } = req.body;
@@ -94,6 +99,31 @@ module.exports = Router()
         )
       );
     } catch (error) {
-      res.send({ error: error.message });
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
     }
   });
+
+router.get(
+  "/myaccount",
+  userAuth.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      let { fields } = req.query;
+      const dbquery = Customer.findById(req.user.id);
+      if (fields) {
+        fields = fields
+          .split(",")
+          .filter((field) => field !== "accountPassword")
+          .join(" ");
+        dbquery.select(fields);
+      }
+      res.send(await dbquery.exec());
+    } catch (error) {
+      res.send(
+        req.app.get("env") === "development" ? error.toString() : "Error"
+      );
+    }
+  }
+);

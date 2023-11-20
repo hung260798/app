@@ -1,4 +1,4 @@
-var {
+/* var {
   Schema,
   model,
   Types: { ObjectId },
@@ -14,3 +14,4 @@ schema = new Schema({
 });
 
 module.exports = model("Token", schema);
+ */

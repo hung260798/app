@@ -7,9 +7,9 @@ var {
 var schema;
 
 schema = new Schema({
-  name: String,
-  phone: String,
-  email: String,
+  name: { type: String, required: true },
+  phone: { type: String, required: true },
+  email: { type: String, required: true },
   picture: String,
 });
 
